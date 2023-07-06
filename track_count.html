@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+<!--
+	Hyperspace by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Santhosh - Projects</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+			<header id="header">
+				<a href="index.html" class="title">Santhosh's Projects</a>
+				<nav>
+					<ul>
+						<li><a href="index.html">Home</a></li>
+					</ul>
+				</nav>
+			</header>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<section id="main" class="wrapper">
+						<div class="inner">
+							<style>
+								.major .button {
+								  /* your button style */
+								  font-size: 12px; /* reduce the font size */
+								  position: absolute; /* take the button out of the normal flow */
+								  transform: translate(750px, 35%); /* offset the button by 10 pixels to the */
+								}
+							</style>	
+							<h1 class="major">Pedestrian Tracker and Counter using YOLOv3 and DeepSORT <a href="https://github.com/Santhosh-Sankar/pedestrian-tracker-counter" class="button" target="_blank">GitHub</a></h1>
+							<h2>Introduction</h2>
+							<p><span class="image right"><img src="images/demo3.gif" alt="" /></span>Tracking and counting pedestrians in video data is a challenging problem that has many practical applications. However, existing methods often suffer from low accuracy, slow speed, or poor robustness to occlusions and dynamic scenes. This project aims to address these challenges by using YOLOv3 and DeepSORT, two powerful and efficient algorithms that can perform pedestrian tracking and counting. Yolov3 is a state-of-the-art object detector that can locate pedestrians with high precision and recall. DeepSORT is a simple and effective algorithm that can associate detections across frames using a deep neural network. By integrating these two methods, I hope to achieve high performance in pedestrian tracking and counting in various scenarios and evaluate the results using MOT16 benchmark.</p> 
+							<h2>Object Detection</h2>
+							<p>The single-stage object detector, Yolov3 was chosen despite being less accurate than two-stage object detectors because they are faster than two-stage object detectors as they do not need to go through the extra step of generating and processing region proposals and enables them to achieve real-time performance on a GPU. Thus Faster R-CNN is chosen as the baseline object detector to compare the performance of Yolov3. For the purpose of comparison, both the models utilize weights pre-trained on the COCO dataset to be used as object detectors for the DeepSORT algorithm.</p>
+							<h2>Object Tracker and Counter - DeepSORT algorithm</h2>
+							<p>DeepSORT is a computer vision tracking algorithm for tracking objects while assigning an ID to each object. DeepSORT extends the SORT (Simple Online Realtime Tracking) algorithm by introducing a deep learning component, an appearance descriptor to reduce identity switches, hence making tracking more efficient. DeepSORT consists of three main components: a detection module, a motion prediction module, and an appearance-matching module. The detection module uses an object detector such as YOLOv3 to detect objects in each frame. The motion prediction module uses a Kalman filter to predict the future location of each object based on its past trajectory. The appearance matching module uses a deep neural network to extract features from each detected object and compare them with the features of existing tracked objects using a cosine distance metric. The final association between detections and tracks is done using the Hungarian algorithm, which considers both the motion and appearance information.</p>
+							<p>To further count the objects, the Tracker class used for tracking objects in every frame is utilized. The tracker class provides the number of unique ids detected in each frame which is used to count the number of pedestrian in each frame. Storing the number of unique IDs encountered across multiple frames is useful to determine the number of pedestrians encountered in the entire video.</p>
+							<h2>Implementation</h2>
+							<h3>Implementation 1 (Visualization)</h3>
+							<p>This implementation merges the object detectors (YOLOv3 and Faster R-CNN) with DeepSORT for object tracking and counting. The bounding boxes of pedestrians detected by the object detector in every frame are drawn with the pedestrian id specified on top of the bounding box.The number of pedestrians detected in each frame along with the number of pedestrians encountered are specified at the left bottom. To further visualize tracking, the path of the pedestrians is visualized by plotting the center of the bounding box for the most recent 50 frames. The video of the visualization can be stored in the desired location specified by the user.</p>
+							<div class="box alt">
+								<div class="row gtr-uniform">
+									<div class="col-6"><span class="image fit"><img src="images/demo1.gif" alt="" /></span></div>
+									<div class="col-6"><span class="image fit"><img src="images/demo2.gif" alt="" /></span></div>
+								</div>
+							</div>
+							<h3>Implementation 2 (Evaluation)</h3>
+							<p>This implementation is similar to the previous implementation, except that this one records the bounded box positions of all the pedestrians along with the confidence values of every pedestrian detected in a CSV file. This CSV file is then utilized by the MOT16 benchmark for evaluating the tracking performance.</p>
+							<h2>Evaluation Results</h2>
+							<p>Some of the results generated by the benchmark after evaluating the performance of DeepSORT with YOLOv3 and RCNN as object detectors are shown below. To look at the complete results generated by the benchmark, <a href="https://github.com/Santhosh-Sankar/pedestrian-detection-tracking-counting/wiki" target="_blank">Click here</a>.</p>
+							<p>YOLOv3 improved the Multiple Object Tracking Accuracy (MOTA) score of DeepSORT by 6%, Multiple Object Tracking Precision (MOTP) score by 3%, and Higher Order Tracking Accuracy (HOTA) score by 2% compared to the Faster RCNN.</p>
+							
+							<div class="table-wrapper">
+								<table class="alt">
+									<thead>
+										<tr>
+											<th>Metric</th>
+											<th>YOLOv3 & DeepSORT</th>
+											<th>Faster RCNN & DeepSORT</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>HOTA</td>
+											<td>33.226</td>
+											<td>31.911</td>
+										</tr>
+										<tr>
+											<td>MOTA</td>
+											<td>33.476</td>
+											<td>27.716</td>
+										</tr>
+										<tr>
+											<td>MOTP</td>
+											<td>75.065</td>
+											<td>72.055</td>
+										</tr>
+										<tr>
+											<td>Recall</td>
+											<td>40.597</td>
+											<td>36.908</td>
+										</tr>
+										<tr>
+											<td>Precision</td>
+											<td>86.118</td>
+											<td>80.977</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</section>
+			</div>
+
+			<!-- Footer
+			<footer id="footer" class="wrapper alt">
+				<div class="inner">
+					<ul class="menu">
+						<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+					</ul>
+				</div>
+			</footer> -->
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

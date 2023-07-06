@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<!--
+	Hyperspace by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Santhosh - Projects</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+			<header id="header">
+				<a href="index.html" class="title">Santhosh's Projects</a>
+				<nav>
+					<ul>
+						<li><a href="index.html">Home</a></li>
+					</ul>
+				</nav>
+			</header>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<section id="main" class="wrapper">
+						<div class="inner">
+							<style>
+								.major .button {
+								  /* your button style */
+								  font-size: 12px; /* reduce the font size */
+								  position: absolute; /* take the button out of the normal flow */
+								  transform: translate(150px, 35%); /* offset the button by 10 pixels to the */
+								}
+							</style>	
+							<h1 class="major">Parallel Image Processing with CUDA<a href="https://github.com/Santhosh-Sankar/image-filtering" class="button" target="_blank">GitHub</a></h1>
+							<h2>Introduction</h2>
+							<p><span class="image right"><img src="images/house.jpg" alt="" /></span>This project demonstrates an image processing application in C++ that can apply various filters to an input image based on the user's choice. The filters include blur (Gaussian), Sobel x, Sobel y, gradient magnitude, blurs and quantization, and cartoonization (with gradient magnitude and blur). The application uses the OpenCV library to handle the image input and output, and the CUDA framework to parallelize the filter operations on the GPU. This results in a significant speedup of 75% compared to the sequential version of the code.</p>
+							<h2>Filters</h2>
+							<h3>Blur (Gaussian)</h3>
+							<p>This filter smooths out the image by applying a Gaussian function to each pixel, which gives more weight to the nearby pixels and less weight to the distant ones. This reduces noise and sharp edges in the image.</p>
+							<h3>Sobel x and Sobel y</h3>
+							<p>These filters find the horizontal and vertical edges in the image by applying a Sobel kernel, which is a matrix that approximates the first derivative of the image intensity in each direction. The Sobel x kernel emphasizes the changes in the x direction, while the Sobel y kernel emphasizes the changes in the y direction.</p>
+							<h3>Gradient magnitude</h3>
+							<p>This filter computes the magnitude of the gradient vector at each pixel, which is obtained by combining the Sobel x and Sobel y results using the Pythagorean theorem. The gradient magnitude represents how strong the edge is at each pixel.</p>
+							<h3>Blur and Quantization</h3>
+							<p>This filter reduces the number of colors in the image by grouping similar pixels into regions and assigning them a single color value. This creates a posterized effect that simplifies the image.</p>
+							<h3>Cartoonization (gradient magnitude and blur)</h3>
+							<p>This filter combines the blurs and quantization filter with the gradient magnitude filter to create a cartoon-like effect. The gradient magnitude is used to create a black outline around the edges, while the blurs and quantization is used to fill in the regions with solid colors.</p>
+							
+							<h2>Implementation</h2>
+							<p>This code utilizes a single function that applies a suitable filter (or gets the filter as the input) based on the user input and calls another function(or kernel in the case of GPU code) to perform the filtering operation. All the filters used are separated to filter kernels/vectors (ie separable filters) to optimize filtering operations.</p>
+							<p>Since some of the filters, like the cartoonization filter, require the use of existing filters like the blur filter. Rather than creating multiple blur filters for every such filter, a single function for applying filters was developed, which can recursively call itself to apply any existing filters to make the code more efficient and easy to maintain. In this case, the function which uses the cartoonization filter calls the same function which also contains the blur filter instead of using another filter.</p>
+							<p>Since the process of filtering consumes more time due to a large number of operations, the filtering code was parallelized to perform operation with each of the separate kernels/vectors. To further split computation, each filter was allocated its own stream in GPU to further optimize computation. This led to a decrease in execution time by 75%.</p>
+							<h2>Visualizations</h2>
+							<figure style="display: inline-block; text-align: center;">
+								<img src="images/house_blur.jpg" alt="" width="700px">
+								<figcaption>Blurred image</figcaption>
+							</figure> 
+							<figure style="display: inline-block; text-align: center;">
+								<img src="images/house_x.jpg" alt="" width="700px">
+								<figcaption>After Sobel X filtering</figcaption>
+							</figure> 
+							<figure style="display: inline-block; text-align: center;">
+								<img src="images/house_y.jpg" alt="" width="700px">
+								<figcaption>After Sobel Y</figcaption>
+							</figure> 
+							<figure style="display: inline-block; text-align: center;">
+								<img src="images/house_mag.jpg" alt="" width="700px">
+								<figcaption>Magnitude image</figcaption>
+							</figure> 
+							<figure style="display: inline-block; text-align: center;">
+								<img src="images/house_quant.jpg" alt="" width="700px">
+								<figcaption>Image after Quantization and Blurring</figcaption>
+							</figure> 
+							<figure style="display: inline-block; text-align: center;">
+								<img src="images/house_cartoon.jpg" alt="" width="700px">
+								<figcaption>Image after Cartoonization</figcaption>
+							</figure> 
+						</div>
+					</section>
+			</div>
+
+			<!-- Footer
+			<footer id="footer" class="wrapper alt">
+				<div class="inner">
+					<ul class="menu">
+						<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+					</ul>
+				</div>
+			</footer> -->
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

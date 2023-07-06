@@ -1,0 +1,171 @@
+<!DOCTYPE HTML>
+<!--
+	Hyperspace by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Santhosh - Projects</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+			<header id="header">
+				<a href="index.html" class="title">Santhosh's Projects</a>
+				<nav>
+					<ul>
+						<li><a href="index.html">Home</a></li>
+					</ul>
+				</nav>
+			</header>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<section id="main" class="wrapper">
+						<div class="inner">
+							<style>
+								.major .button {
+								  /* your button style */
+								  font-size: 12px; /* reduce the font size */
+								  position: absolute; /* take the button out of the normal flow */
+								  transform: translate(750px, 35%); /* offset the button by 10 pixels to the */
+								}
+							</style>	
+							<h1 class="major">Pedestrian Tracker and Counter using YOLOv3 and DeepSORT <a href="https://github.com/Santhosh-Sankar/image-retrieval" class="button" target="_blank">GitHub</a></h1>
+							<h2>Introduction</h2>
+							<p><span class="image right"><img src="images/se.png" alt="" /></span>This project provides a solution to the Google Landmark Retrieval Challenge, which is a computer vision competition hosted by Kaggle where the goal is to develop end-to-end models that are expected to retrieve relevant database images to a given query image. This competition provides the clean version of the Google Landmarks Dataset v2 (GLD-v2) which contains around 1.6 million images with 81,313 landmarks. The dataset is divided into two sets of images: index images and training images. The index images are used to retrieve relevant images for each query image, while the test images are used to train the retrieval models.</p>
+							<h2>Data Preprocessing</h2>
+							<p>As the training dataset was cleaned, there exists missing labels and thus the entire training data was relabeled. For this purpose, a Python script was developed to find the number of unique landmarks (81313) and remap them within that value(0 - 81,312).</p>
+							<blockquote><h3>Issue 1</h3>Splitting the data randomly as a train and test set may cause some classes to have fewer to no images for training as there exists a varying number of images in each class. A script was developed which randomly selects a small percentage (20%) of the images only from classes with 5 images or more as testing data. These numbers were obtained after some hyperparameter tuning.</blockquote>
+							<p>Since Siamese models require a pair of images as input along with their similarity label (1 if they have the same labels and 0 if not), new data was generated from the classification data of landmarks provided in the challenge.</p>
+							<blockquote><h3>Issue 2</h3>Same image pairs cannot be used in every epoch as the model would only learn similarities between the same pairs which will lead to overfitting. Thus the training script was modified to generate a new set of similar and dissimilar image pairs in every epoch thereby solving this issue.</blockquote>
+							<h2>Model Selection</h2>
+							<p>Siamese models were used in this case as these model as they can effectively learn discriminative feature representations can which are then used to measure the similarity or distance between pairs or triplets of images based on their visual content.</p>
+							<p>The attention module further improves the Siamese networks by extracting local features from the images and refining them by weighted pooling, which allows the networks to output robust representations for noisy images and achieve better retrieval performance. These mechanisms can also be used to directly compare a query image and a retrieved candidate on a pixel level, which can capture fine-grained details and improve the ranking accuracy.</p>
+							<h2>Model development</h2>
+							<p>TensorFlow was used as the ML framework for model development. The ResNet-101 was used as the backbone model for the sub-network which was then coupled with four different attention modules separately- Spatial, channel, Squeeze and Excitation (SE), and Convolutional Block Attention Module (CBAM).</p>
+							<h3>Spatial attention module</h3>
+							<p>Based on the “Learn to Pay Attention” paper by Jetley et al. (2018), the spatial attention module uses an attention mechanism that takes outputs of each residual block and Global Average Pooling to produce attention-weighted feature maps. The outputs from all the attention layers were concatenated to get a single feature vector.</p>
+							<h3>Convolutional Block Attention Module (CBAM)</h3>
+							<p>Given an intermediate feature map, CBAM sequentially infers attention maps along two separate dimensions, channel and spatial, which are then multiplied to the input feature map for adaptive feature refinement. CBAM is a lightweight and general module that can be integrated into any CNN architecture seamlessly with negligible overheads and is end-to-end trainable along with base CNNs.</p>
+							<h3>Squeeze and Excitation (SE) module</h3>
+							<p>A squeeze-and-excitation block is a way of enhancing the features learned by CNNs by using a small network to learn how important each feature channel is for a given input and then adjusting the feature channels by multiplying them with the learned importance weights. This way, the network can focus on the most relevant features and suppress the less useful ones.</p>
+							<h3>Channel attention module</h3>
+							<p>Channel attention is a technique that aims to enhance the feature representation of convolutional neural networks by exploiting the inter-channel relationship of feature maps. The channel attention implemented here is loosely based on the channel attention used in CBAM which determines attention-weighted feature maps along the channel dimension which are then passed through a dense layer for further feature refinement.</p>
+							<h3>Ensemble model</h3>
+							<p>Different ensembles of the above models were experimented with to improve the Siamese network. The outputs of each model in the ensemble were concatenated to form a more descriptive feature vector for image similarity comparison.</p>
+							<h2>Loss function and optimizer</h2>
+							<p>The contrastive loss was used as the loss function as it is a distance-based loss that aims to bring similar examples closer together in the embedding space while pushing dissimilar examples farther apart. This is achieved by minimizing the distance between embeddings of positive (similar) pairs and ensuring that the distance between embeddings of negative (dissimilar) pairs is larger than a predefined margin.</p>	
+							<p>Adam optimizer was used as it is based on adaptive moment estimation, which means it adjusts the learning rate for each weight according to the gradient statistics. It is efficient, robust, and easy to use.</p>
+							<h2>Model Training</h2>
+							<p>The model was trained using the P100 GPUs made available in the Northeastern HPC Discovery Cluster. The contrastive loss was selected as the objective function and Adam as the optimizer with the learning rate of 1x10<sup>-3</sup> for feature extraction. The margin for contrastive loss is set to 10 after some hyperparameter tuning for the model to be more flexible in bringing together and separating the high-dimensional feature vectors of similar and dissimilar images.</p>
+							<blockquote><h3>Issue 3</h3>Since the validation set is large, computing the validation accuracy at the end of every batch is not feasible.  Hence, a callback was developed to sample a small mini-batch of size 256 at random from the validation set after the end of every batch to compute validation accuracy, and the training is stopped when the difference in validation accuracy of the latest and previous batch is less than 1x10<sup>-4</sup></blockquote>
+							<h2>Visualizing the retrieval results</h2>
+							<p>The retrieval results of the top 10 similar images along with the similarity distance (L2 distance) produced by some of the above Siamese networks are shown below.</p>
+							<figure style="display: inline-block; text-align: center;">
+								<img src="images/cbam.png" alt="" width="700px">
+								<figcaption>Siamese network with Resnet-101 & CBAM subnet</figcaption>
+							</figure> 
+							<figure style="display: inline-block; text-align: center;">
+								<img src="images/se.png" alt="" width="700px">
+								<figcaption>Siamese network with Resnet-101 & SE subnet</figcaption>
+							</figure> 
+							<figure style="display: inline-block; text-align: center;">
+								<img src="images/ensemble.png" alt="" width="700px">
+								<figcaption>Siamese network with ensemble of SE,CBAM and Spatial attention subnet</figcaption>
+							</figure> 
+							<h2>Evaluation Results</h2>
+							<h3>Evaluation Metric</h3>
+							<p><span class="image right"><img src="images/map100.png" alt="" /></span>The evaluation metric used is the same as the competition metric i.e. mean Average Precesion@100 (mAP@100),  which measures the quality of the top 100 ranked retrieval results.</p>
+							<h3>Evaluation Process</h3>
+							<p>For evaluation, Revisited Oxford and Paris benchmark were used as it provides more reliable annotation, larger size, and higher challenge levels. It also introduces new queries and compares different methods on the new benchmark, showing that image retrieval is still an open problem.</p>
+							<p>An evaluation script was developed based on the evaluation script used in GLDv2.</p>
+							<blockquote><h3>Issue 4</h3>Siamese networks are pretty slow in finding the best set of similar images during inference time as the model generates the same set of feature vectors for index images for every input query image. Feature vectors for all the index images were generated once and stored in the “.npy” format, after passing the images through the Siamese subnetwork. Thus during inference time, only the feature vector of the input query image needs to be generated and L2 distances is calculated between the query feature vector and the previously stored feature vectors of the index images.</blockquote>
+							<h3>Results</h3>
+							<p>These were the results obtained after evaluating all the Siamese models. The ensemble of Spatial + CBAM + SE attention achieved the highest mAP.</p>
+							
+							<p>The below table summarizes the mAP obtained after coupling ResNet-101 with different attention modules indivitually.</p>
+							<div class="table-wrapper">
+								<table class="alt">
+									<thead>
+										<tr>
+											<th>Attention module</th>
+											<th>mAP</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>Spatial</td>
+											<td>9.96</td>
+										</tr>
+										<tr>
+											<td>Channel</td>
+											<td>10.72</td>
+										</tr>
+										<tr>
+											<td>CBAM</td>
+											<td>11.36</td>
+										</tr>
+										<tr>
+											<td>SE</td>
+											<td>11.89</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<p>The below table summarizes the mAP obtained after coupling ResNet-101 with different ensemble of attention modules.</p>
+							<div class="table-wrapper">
+								<table class="alt">
+									<thead>
+										<tr>
+											<th>Attention module</th>
+											<th>mAP</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>SE + CBAM</td>
+											<td>13.02</td>
+										</tr>
+										<tr>
+											<td>SE + CBAM + Spatial + Channel</td>
+											<td>13.35</td>
+										</tr>
+										<tr>
+											<td>SE + CBAM + Spatial</td>
+											<td>16.29</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</section>
+			</div>
+
+			<!-- Footer
+			<footer id="footer" class="wrapper alt">
+				<div class="inner">
+					<ul class="menu">
+						<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+					</ul>
+				</div>
+			</footer> -->
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<!--
+	Hyperspace by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Santhosh - Projects</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+			<header id="header">
+				<a href="index.html" class="title">Santhosh's Projects</a>
+				<nav>
+					<ul>
+						<li><a href="index.html">Home</a></li>
+					</ul>
+				</nav>
+			</header>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<section id="main" class="wrapper">
+						<div class="inner">
+							<style>
+								.major .button {
+								  /* your button style */
+								  font-size: 12px; /* reduce the font size */
+								  position: absolute; /* take the button out of the normal flow */
+								  transform: translate(750px, 35%); /* offset the button by 10 pixels to the */
+								}
+							</style>	
+							<h1 class="major">Performance Comparision of Reinforcement Learning Algorithms in Super Mario Bros: DQN, DDQN, and PPO<a href="https://github.com/Santhosh-Sankar/super-mario-bros-rl-agents" class="button" target="_blank">GitHub</a></h1>
+							<h2>Introduction</h2>
+							<p><span class="image right"><img src="images/PPO.gif" alt="" /></span>This project tackles a reinforcement learning problem in computer vision, where the goal is to play a single level of Super Mario Bros, a classic video game that involves dynamic and stochastic elements, as efficiently as possible.  Since the state space is massive and we have limited memory, it was practical to go for non-linear function approximation methods so we didn’t have to hold a large amount of data like the Q-table values in memory.</p> 
+							<p>This problem can be solved using model-free reinforcement learning algorithms that do not rely on a model of the environment, and that belong to two different categories:</p>
+							<div class="row">
+								<div class="col-6 col-12-medium">
+									<ul>
+										<li>Value function approximation methods which learn an action-value function that estimates the expected return for each action and</li>
+										<li>Policy function approximation methods which learn a stochastic policy function that directly outputs the probability of each action. </li>
+									</ul>
+								</div>
+							</div>
+							<p>The value function approximation methods are Deep Q Networks and Double Deep-Q Networks, which improve the stability and accuracy of Deep Q Networks by using two networks to reduce overestimation bias. The policy function approximation method is Proximal Policy Optimization, which uses a surrogate objective function to optimize the policy. By comparing these algorithms, the project aims to evaluate their strengths and weaknesses in playing Super Mario Bros as efficiently as possible.</p>
+							<h2>The Super Mario Environment</h2>
+							<p>The Mario environment is formally defined as an MDP below so we can apply reinforcement learning algorithms to solve the problem. </p>
+							<h3>State space</h3>
+							<p>The state here is an instance of the game as a frame, the raw RGB input which is of the size 3 x 240 x 256 since that's the default for the Nintendo Entertainment System(NES) emulator. </p>
+							<blockquote><h3>Issue 1</h3>The presence of an enormous amount of data increases the computation. Thus, some pre-processing is done to the input to reduce computation and with minimal loss of information.</blockquote>
+							<p>The following are the pre-processing done on the environment by utilizing the gym wrapper class:</p>
+							<div class="row">
+								<div class="col-10 col-20-medium">
+									<ul>
+										<li><b>GrayScaleObservation</b> wrapper was used to convert the frames to grayscale effectively reducing the frame from 3 channel RGB based frame (3x240x256) to 1x240x256 which reduces computation by reducing the input size for the convolutional neural network</li>
+										<li><b>ResizeObservation</b> was used to down-scale the image to 1x84x84 for the same reason as above to make it computationally less expensive as the number of pixels reduces from 61, 440 down to 7056.</li>
+										<li><b>SkipFrame</b> wrapper was used to skip frames so that only 1 frame for every 4 frames is taken into account as there is not a big difference in information between the nearby frames. The 4-th frame aggregates rewards accumulated over each skipped frame.</li>
+										<li><b>FrameStack</b> wrapper was used to stack 4 frames together so that the state will give the direction of motion of the agent. So if there are 16 frames, every 4th frame is appended to form a single state with the size of 4x84x84.</li>
+										<li><b>JoypadSpace</b> wrapper was a wrapper that helps choose the action subset to use in the NES emulator, the variant of the action set we used is RIGHT ONLY which will be explained in the next subsection.</li>
+									</ul>
+								</div>
+							</div>
+
+							<h3>Action Space</h3>
+							<p>OpenAI Gym implementation of the Super Mario environment has 3 prebuilt action space subsets available to use, namely right only, simple movements, and complex movements, each having a set of possible actions that Mario can do.  Complex movements would yield the best result as it has a large set of actions but more actions lead to more Q-value calculations in each iteration. Thus, right only action subset was chosen as it had the least moves. It has the following set of actions:</p>
+							<div class="row">
+								<div class="col-10 col-20-medium">
+									<ul>
+										<li>No Move</li>
+										<li>Right</li>
+										<li>Right + Jump</li>
+										<li>Right + Down</li>
+										<li>Right + Jump + Down</li>
+									</ul>
+								</div>
+							</div>
+							
+							<h3>Reward function</h3>
+							<p>The Reward Function used in the environment is a sum of 3 factors as shown below:</p>
+							<div class="row">
+								<div class="col-10 col-20-medium">
+									<ul>
+										<li><b>v</b> is the first component which gives a reward for moving right or towards the goal, the rules are as follows:</li>
+										<div class="row">
+											<div class="col-10 col-20-medium">
+												<ol>
+													<li>if Mario goes right towards the goal, v > 0</li>
+													<li>if Mario stays in place, v = 0</li>
+													<li>if Mario goes left away from the goal, 0 > v</li>
+												</ol>
+											</div>
+										</div>
+										<li><b>c</b> is the second component which gives the difference in the game clock between frames:</li>
+										<li><b>d</b> is the final component that gives a death penalty as follows:</li>
+										<div class="row">
+											<div class="col-10 col-20-medium">
+												<ol>
+													<li>d = 0, if alive</li>
+													<li>d = -15, on death</li>
+												</ol>
+											</div>
+										</div>
+									</ul>
+								</div>
+							</div>
+							<p>The reward function is the summation of all three variables: Reward = v + c + d.</p>
+							
+							<h3>Transition dynamics</h3>
+							<p>The transition function for this environment is deterministic - if you press the right key, you will with a 100 percent chance go right.</p>
+
+							<h2>Algorithms</h2>
+							<h3>Deep Q Networks (DQN)</h3>
+							<p>A value-based reinforcement learning algorithm that uses a neural network to approximate the action-value function, which estimates the expected return for each action given a state. DQN uses techniques such as experience replay, target networks and reward clipping to stabilize the learning process and improve the performance. DQN can handle discrete action spaces, but not continuous ones.</p>
+							<h3>Double Deep Q Networks (DDQN)</h3>
+							<p>An extension of DQN that addresses the problem of overestimation bias, which occurs when the maximum Q-value over all possible actions is used to compute the target Q-value. DDQN uses two networks: one to select the best action and another to evaluate its value. This reduces the correlation between the action selection and the value estimation and leads to more accurate Q-values. DDQN can also handle discrete action spaces, but not continuous ones.</p>
+							<h3>Proximal Policy Optimization (PPO)</h3>
+							<p>A  policy-based reinforcement learning algorithm that uses a neural network to approximate the stochastic policy function, which directly outputs the probability of each action given a state. PPO uses a surrogate objective function that penalizes large deviations from the previous policy, and a clipped ratio of probabilities to ensure a lower bound on the performance improvement. PPO can handle both discrete and continuous action spaces and is more sample-efficient and stable than DQN or DDQN.</p>
+							
+							<h2>Model training and testing</h2>
+							<h3>Training</h3>
+							<p>Approximately 300 hours were dedicated to training the three agents: DQN, DDQN, and PPO. The models were initially trained for 1 million time steps; however, the performance of the trained models was unsatisfactory. As a result, the number of steps was increased to 3 million, allowing the agent to train around 10,000 episodes.</p>
+							<p>Throughout the training process,  various hyperparameters of the RL model and the CNN model were experimented with, including gamma, learning rate, batch size, behavior and target policy frequency update, and epsilon duration. To prevent the agent from wasting time in states where it might get stuck, the maximum time steps per episode were limited to 500. Due to hardware limitations, the buffer size was restricted to 30,000. The behavior policy was updated frequently, every five steps, and the target policy was updated every 5,000 steps and the PPO clipping ratio was set to 0.2.</p>
+
+							<h3>Testing</h3>
+							<p>The trained models obtained from all three algorithms were utilized to run the agent for 1000 episodes, during which the total reward, discounted returns, and steps were determined only for episodes in which the agent successfully completed the game. The following plots were created for all three algorithms after running the agent for 1000 episodes. For testing the DQN and DDQN algorithms, the epsilon-greedy policy with an ϵ value of 0.1 was employed, the same as the one used for training.</p>
+							<p>The first image visulaizes the model trained with DDQN and the second with PPO.</p>
+							<div class="box alt">
+								<div class="row gtr-uniform">
+									<div class="col-4"><span class="image fit"><img src="images/DDQN.gif" alt="" /></span></div>
+									<div class="col-4"><span class="image fit"><img src="images/PPO.gif" alt="" /></span></div>
+								</div>
+							</div>
+							<h2>Evaluation Results</h2>
+							<p>The below table summarizes the performances of the trained models under various metrics.</p>
+							<div class="table-wrapper">
+								<table class="alt">
+									<thead>
+										<tr>
+											<th>Metric</th>
+											<th>DQN</th>
+											<th>DDQN</th>
+											<th>PPO</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>Average Returns</td>
+											<td>708.34</td>
+											<td>704.51</td>
+											<td>853.24</td>
+										</tr>
+										<tr>
+											<td>Average steps taken per episode</td>
+											<td>537.58</td>
+											<td>549.49</td>
+											<td>342.07</td>
+										</tr>
+										<tr>
+											<td>Number of episodes successfully completed</td>
+											<td>430</td>
+											<td>424</td>
+											<td>720</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<p>We can observe that PPO performs the best in comparison with DQN and DDQN.</p>
+						</div>
+					</section>
+			</div>
+
+			<!-- Footer
+			<footer id="footer" class="wrapper alt">
+				<div class="inner">
+					<ul class="menu">
+						<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+					</ul>
+				</div>
+			</footer> -->
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
