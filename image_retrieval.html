@@ -38,7 +38,7 @@
 								  transform: translate(750px, 35%); /* offset the button by 10 pixels to the */
 								}
 							</style>	
-							<h1 class="major">Pedestrian Tracker and Counter using YOLOv3 and DeepSORT <a href="https://github.com/Santhosh-Sankar/image-retrieval" class="button" target="_blank">GitHub</a></h1>
+							<h1 class="major">Large scale landmark image retrieval using Siamese networks and Attention<a href="https://github.com/Santhosh-Sankar/image-retrieval" class="button" target="_blank">GitHub</a></h1>
 							<h2>Introduction</h2>
 							<p><span class="image right"><img src="images/se.png" alt="" /></span>This project provides a solution to the Google Landmark Retrieval Challenge, which is a computer vision competition hosted by Kaggle where the goal is to develop end-to-end models that are expected to retrieve relevant database images to a given query image. This competition provides the clean version of the Google Landmarks Dataset v2 (GLD-v2) which contains around 1.6 million images with 81,313 landmarks. The dataset is divided into two sets of images: index images and training images. The index images are used to retrieve relevant images for each query image, while the test images are used to train the retrieval models.</p>
 							<h2>Data Preprocessing</h2>
@@ -47,7 +47,7 @@
 							<p>Since Siamese models require a pair of images as input along with their similarity label (1 if they have the same labels and 0 if not), new data was generated from the classification data of landmarks provided in the challenge.</p>
 							<blockquote><h3>Issue 2</h3>Same image pairs cannot be used in every epoch as the model would only learn similarities between the same pairs which will lead to overfitting. Thus the training script was modified to generate a new set of similar and dissimilar image pairs in every epoch thereby solving this issue.</blockquote>
 							<h2>Model Selection</h2>
-							<p>Siamese models were used in this case as these model as they can effectively learn discriminative feature representations can which are then used to measure the similarity or distance between pairs or triplets of images based on their visual content.</p>
+							<p>Siamese models were used in this case as these models as these can effectively learn discriminative feature representations can which are then used to measure the similarity or distance between pairs or triplets of images based on their visual content.</p>
 							<p>The attention module further improves the Siamese networks by extracting local features from the images and refining them by weighted pooling, which allows the networks to output robust representations for noisy images and achieve better retrieval performance. These mechanisms can also be used to directly compare a query image and a retrieved candidate on a pixel level, which can capture fine-grained details and improve the ranking accuracy.</p>
 							<h2>Model development</h2>
 							<p>TensorFlow was used as the ML framework for model development. The ResNet-101 was used as the backbone model for the sub-network which was then coupled with four different attention modules separately- Spatial, channel, Squeeze and Excitation (SE), and Convolutional Block Attention Module (CBAM).</p>
@@ -79,7 +79,7 @@
 							</figure> 
 							<figure style="display: inline-block; text-align: center;">
 								<img src="images/ensemble.png" alt="" width="700px">
-								<figcaption>Siamese network with ensemble of SE,CBAM and Spatial attention subnet</figcaption>
+								<figcaption>Siamese network with an ensemble of SE,CBAM and Spatial attention subnet</figcaption>
 							</figure> 
 							<h2>Evaluation Results</h2>
 							<h3>Evaluation Metric</h3>
