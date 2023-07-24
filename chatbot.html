@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<!--
+	Hyperspace by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Santhosh - Projects</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
+
+		<!-- Header -->
+			<header id="header">
+				<a href="index.html" class="title">Santhosh's Projects</a>
+				<nav>
+					<ul>
+						<li><a href="index.html">Home</a></li>
+					</ul>
+				</nav>
+			</header>
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Main -->
+					<section id="main" class="wrapper">
+						<div class="inner">
+							<style>
+								.major .button {
+								  /* your button style */
+								  font-size: 12px; /* reduce the font size */
+								  position: absolute; /* take the button out of the normal flow */
+								  transform: translate(200px, 35%); /* offset the button by 10 pixels to the */
+								}
+							</style>	
+							<h1 class="major">Chatbot using seq2seq transformer<a href="https://github.com/Santhosh-Sankar/chatbot" class="button" target="_blank">GitHub</a></h1>
+							<h2>Introduction</h2>
+							<p>This project aims to build and train an end-to-end sequence to sequence chatbot model from scratch without using any prebuilt layers, especially the multi-head attention layers. A chatbot is a software application that uses artificial intelligence and natural language processing to interact with human users via text or voice. Chatbots can provide various services, such as answering questions, giving information, generating content, and more. The chatbot is trained on the Cornell Movie-Dialogs Corpus which is a large metadata-rich collection of fictional conversations extracted from raw movie scripts. It contains 220,579 conversational exchanges between 10,292 pairs of movie characters and involves 9,035 characters from 617 movies. </p>
+							<h2>Data preprocessing</h2>
+							<p>Two text files, one containing the conversations as a list of dialog IDs and the other mapping the dialogs to their corresponding dialog ID are used for training the chatbot. Each pair of dialogs are stored in two lists, the first one to be used as queries and the second to be used as responses to the queries. Also, note that each query and its corresponding response are stored in the same index in both lists. The lists indexes were shuffled and split into training and testing sets to avoid the model from learning order dependencies. </p>
+							<p>A word tokenizer is initialized using <i>tf.keras.preprocessing.Tokenizer</i> and used to tokenize the words in both lists. The start and end tokens were also added to all the dialogs before tokenizing all the dialogs. To speed up the training process, the tf.data.Dataset pipeline was used which enables caching the dataset in memory and prefetching it as required.</p>
+							<h2>Model selection </h2>
+							<p><span class="image right"><img src="images/transformers.png" alt="" /></span>Many models like RNN can be used as the model for the chatbot but transformers are usually preferred as their neural network architecture uses attention mechanisms to learn the relationships between words and sentences in a given text. Transformers can handle long and complex texts with high accuracy and efficiency, capture long-range dependencies and contextual information better than other models, be easily adapted to different NLP tasks by adding task-specific layers or modules, and leverage large amounts of pre-trained data to learn general language representations that can be fine-tuned for specific domains or tasks. Therefore, transformers satisfy the model requirements for a chatbot by providing a flexible, efficient, and powerful framework for natural language understanding and generation and was chosen as the model for the chatbot.</p>
+							<h3>Multi-head attention module</h3>
+							<p>Multi-head attention is a key component of the transformer model, which is widely used for natural language processing tasks. Multi-head attention allows the model to jointly attend to information from different representation subspaces, as described in the paper "Attention Is All You Need" ¹. In other words, multi-head attention enables the model to learn different aspects of the input text, such as syntax, semantics, context, and relevance.</p>
+							<p>Multi-head attention works as follows: First, the input query, key, and value vectors are projected into multiple subspaces using linear layers. Then, each subspace is processed by a scaled dot-product attention function, which computes the similarity between the query and the key vectors and uses it to weight the value vectors. Next, the outputs of the attention functions are concatenated and linearly transformed into the expected dimension. Finally, the output of the multi-head attention layer is fed into a residual connection and a layer normalization module.</p>
+							<p>Multi-head attention has several advantages over single-head attention. First, it increases the model's expressiveness and capacity by allowing it to learn from multiple perspectives. Second, it reduces the computational complexity and memory requirements by splitting the input into smaller chunks. Third, it improves the performance and generalization of the model by reducing the risk of overfitting to a single subspace.</p>
+
+							<h2>Model development and training</h2>
+							<p>The multi-head attention module despite being available as a predefined layer in TensorFlow was developed from scratch along with the encoder and decoder modules. Two masks, a pad mask to mask the pad tokens, and a look ahead mask, which prevents the model from looking at the future tokens by masking the future tokens. The pad mask is also integrated with the look-ahead mask to mask the pad tokens during cross-attention. The model is currently being trained on Kaggle TPUs.</p>
+							<p><b>This project is a work in progress as it requires significant hyperparameter tuning with restricted TPU availability. Further training details and hyperparameters will be revealed as soon as the training is completed.</b></p>
+
+
+
+			<!-- Footer
+			<footer id="footer" class="wrapper alt">
+				<div class="inner">
+					<ul class="menu">
+						<li>&copy; Untitled. All rights reserved.</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+					</ul>
+				</div>
+			</footer> -->
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
