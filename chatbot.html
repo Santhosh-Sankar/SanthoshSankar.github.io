@@ -38,7 +38,7 @@
 								  transform: translate(200px, 35%); /* offset the button by 10 pixels to the */
 								}
 							</style>	
-							<h1 class="major">Chatbot using seq2seq transformer<a href="https://github.com/Santhosh-Sankar/chatbot" class="button" target="_blank">GitHub</a></h1>
+							<h1 class="major">Chatbot using seq2seq transformer<a href="https://github.com/Santhosh-Sankar/Chatbot" class="button" target="_blank">GitHub</a></h1>
 							<h2>Introduction</h2>
 							<p>This project aims to build and train an end-to-end sequence to sequence chatbot model from scratch without using any prebuilt layers, especially the multi-head attention layers. A chatbot is a software application that uses artificial intelligence and natural language processing to interact with human users via text or voice. Chatbots can provide various services, such as answering questions, giving information, generating content, and more. The chatbot is trained on the Cornell Movie-Dialogs Corpus which is a large metadata-rich collection of fictional conversations extracted from raw movie scripts. It contains 220,579 conversational exchanges between 10,292 pairs of movie characters and involves 9,035 characters from 617 movies. </p>
 							<h2>Data preprocessing</h2>
@@ -53,9 +53,41 @@
 
 							<h2>Model development and training</h2>
 							<p>The multi-head attention module despite being available as a predefined layer in TensorFlow was developed from scratch along with the encoder and decoder modules. Two masks, a pad mask to mask the pad tokens, and a look ahead mask, which prevents the model from looking at the future tokens by masking the future tokens. The pad mask is also integrated with the look-ahead mask to mask the pad tokens during cross-attention. The model is currently being trained on Kaggle TPUs.</p>
-							<p><b>This project is a work in progress as it requires significant hyperparameter tuning with restricted TPU availability. Further training details and hyperparameters will be revealed as soon as the training is completed.</b></p>
+							<h3>Training details</h3>
+							<p>The model was trained with two tokenizers - the subword-tokenizer and the word tokenizer using Kaggle TPUs for 250 epochs (I wasn’t able to increase the number of epochs as Kaggle TPUs suspiciously stops training when trained with more epochs). The batch size was set to be 512 times the number of TPU cores (4096).</p>
+							<h3>Evaluation</h3>
+							<p>Both the model after training were evaluated with BLEU metric. The BLEU evaluation metric is a way of measuring how well a chatbot model can generate natural language responses that are similar to human-written ones. It compares the candidate responses from the chatbot model to one or more reference responses that are considered to be good quality. The BLEU score is calculated based on the number of matching n-grams (sequences of words) between the candidate and the reference responses, with higher weights for longer n-grams. The BLEU score ranges from 0 to 1, with 1 being a perfect match and 0 being a complete mismatch.</p>
 
+							<p>The below table summarizes the BLEU scores obtained after training the transformer model for 250 epochs.</p>
+							<div class="table-wrapper">
+								<table class="alt">
+									<thead>
+										<tr>
+											<th>Tokenizer</th>
+											<th>BLEU score (%)</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>Word tokenizer</td>
+											<td>2.679</td>
+										</tr>
+										<tr>
+											<td>Subword tokenizer</td>
+											<td>0.0</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
 
+							<p>The trained chatbot models gave the following replies for the questions asked.</p>
+							<div class="box alt">
+								<div class="row gtr-uniform">
+									<div class="col-6"><span class="image fit"><img src="images/chatbot_word.png" alt="" /></span></div>
+									<div class="col-6"><span class="image fit"><img src="images/chatbot_sub.png" alt="" /></span></div>
+								</div>
+							</div>
+							
 
 			<!-- Footer
 			<footer id="footer" class="wrapper alt">
