@@ -38,7 +38,7 @@
 								  transform: translate(200px, 35%); /* offset the button by 10 pixels to the */
 								}
 							</style>	
-							<h1 class="major">Chatbot using seq2seq transformer<a href="https://github.com/Santhosh-Sankar/Chatbot" class="button" target="_blank">GitHub</a></h1>
+							<h1 class="major">Development and optimization of seq2seq Transformer based chatbot<a href="https://github.com/Santhosh-Sankar/Chatbot" class="button" target="_blank">GitHub</a></h1>
 							<h2>Introduction</h2>
 							<p>This project aims to build and train an end-to-end sequence to sequence chatbot model from scratch without using any prebuilt layers, especially the multi-head attention layers. A chatbot is a software application that uses artificial intelligence and natural language processing to interact with human users via text or voice. Chatbots can provide various services, such as answering questions, giving information, generating content, and more. The chatbot is trained on the Cornell Movie-Dialogs Corpus which is a large metadata-rich collection of fictional conversations extracted from raw movie scripts. It contains 220,579 conversational exchanges between 10,292 pairs of movie characters and involves 9,035 characters from 617 movies. </p>
 							<h2>Data preprocessing</h2>
@@ -87,6 +87,34 @@
 									<div class="col-6"><span class="image fit"><img src="images/chatbot_sub.png" alt="" /></span></div>
 								</div>
 							</div>
+
+							<h2>Inference Acceleration</h2>
+							<p>To further accelerate inference, an optimized runtime engine was generated from the trained model using NVIDIA TensorRT.  TensorRT is a software development kit (SDK) that enables high-performance deep learning inference on NVIDIA GPUs. It works by optimizing and executing trained neural networks from various frameworks, such as TensorFlow, PyTorch, and MXNet. TensorRT can reduce the latency and increase the throughput of inference applications, such as natural language processing, computer vision, and recommender systems.</p>
+							<h3>Implementation details</h3>
+							<p>In this project, the trained Transformer model was saved and then converted to ONNX (Open Neural Network eXchange) format using the third-party library tf2onnx. The inference batch size was fixed and set to 32 on the ONNX file. The ONNX file was then converted to a run time engine for inference using TensorRT. The engine was then leveraged along with the PyCUDA library to accelerate inference on a GPU achieving significant inference speedup. </p>
+							<h3>Results</h3>
+							<p>The below table summarizes the time taken in seconds to perform inference on a batch of 32 sentences.</p>
+							<div class="table-wrapper">
+								<table class="alt">
+									<thead>
+										<tr>
+											<th>Model</th>
+											<th>Inference speed (seconds)</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>Non-optimized model</td>
+											<td>8.26</td>
+										</tr>
+										<tr>
+											<td>TensorRT engine</td>
+											<td>1.36</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							<p>While the non-optimized model took 8.26 seconds to perform inference on a batch of 32 sentences, the optimized runtime engine was able to perform inference on the same batch within 1.36 seconds, achieving 83.5% inference speedup.</p>
 							
 
 			<!-- Footer
